@@ -1,44 +1,27 @@
 ﻿# 前言
 
-**注意：浇水由LED1的亮灭进行模拟**
-
-源码参考：
-
-&nbsp;&nbsp;&nbsp;&nbsp;[步进电机28BYJ-48的驱动程序(stm32f103c8t6)](https://blog.csdn.net/qq_17280755/article/details/78459842)
-
-&nbsp;&nbsp;&nbsp;&nbsp;正点原子按键实验
-
-开发板：正点原子 STM32F103 精英版
-
-语言：C语言
-
-开发环境：Keil5
-
-**开发板**使用了 LED KEY 步进电机28BYJ-48  ULN2003驱动
+具体细节内容可以参考：[STM32F103+步进电机28BYJ-48+ULN2003 实现简单的正反转demo](https://blog.csdn.net/Ikaros_521/article/details/116598144?spm=1001.
+2014.3001.5501)，这里不再赘述。
 
 ## 代码下载：
 
-[码云](https://gitee.com/ikaros-521/STM32_28BYJ-48_demo) [GitHub](https://github.com/Ikaros-521/STM32_28BYJ-48_demo)
+[码云](https://gitee.com/ikaros-521/STM32_28BYJ-48_apply_demo1) [GitHub](https://github.com/Ikaros-521/STM32_28BYJ-48_apply_demo1)
 
 ## 功能介绍：
 
-LED1约1秒1反转。
+1、LED0在不同模式下根据不同时间进行翻转。
 
-按KEY0，翻转LED1，电机反转1圈
+2、按KEY_UP，翻转LED1，切换模式，分别为
 
-按KEY1，翻转LED1，电机正转1圈
+ - 不工作模式 共0.5秒
+ - 摇头模式 （顺n个5.625度 停顿x个0.1秒 逆n个5.625度 停顿x个0.1秒） 共0.2x秒
+ - 转圈模式1 （顺1圈，停顿y个0.1秒） 共0.1y秒
+ - 转圈模式2 （逆1圈，停顿z个0.1秒） 共0.1z秒
+ - 自定义模式 （自行修改代码） 共3.5秒
 
-按KEY_UP，翻转LED1，电机正转半圈
-
-# 参考资料
-
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20210510155935841.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0lrYXJvc181MjE=,size_16,color_FFFFFF,t_70)
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20210510160002540.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0lrYXJvc181MjE=,size_16,color_FFFFFF,t_70)
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20210510160015101.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0lrYXJvc181MjE=,size_16,color_FFFFFF,t_70)
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20210510161941806.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0lrYXJvc181MjE=,size_16,color_FFFFFF,t_70)
+3、按KEY0，翻转LED1，电机顺时针旋转5.625度。按KEY1，翻转LED1，逆时针旋转5.625度。(键盘外部中断）
 
 # 接线
-
 ```c
 +    —>   5V
 -    —>   GND
@@ -52,6 +35,41 @@ IN4  —>   PF4
 
 # 效果图
 
-按下KEY0，LED1翻转，电机反转一圈。风车折法参考 [传送门](https://jingyan.baidu.com/article/3aed632ea9e8583011809112.html)
+## 摇头模式 
 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20210510161517723.gif#pic_center)
+```c
+// 24 * 5.625 = 135
+n = 24; 
+// 0.2 * 10 = 2
+x = 10;
+```
+
+（顺n个5.625度 停顿x个0.1秒 逆n个5.625度 停顿x个0.1秒） 共0.2x秒
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210513111155151.gif#pic_center)
+
+## 转圈模式1
+
+```c
+// 0.1 * 5 = 0.5
+y = 5;
+```
+
+（顺1圈，停顿y个0.1秒） 共0.1y秒
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/2021051311195744.gif#pic_center)
+
+## 转圈模式2
+
+```c
+// 0.1 * 0 = 0
+z = 0;
+```
+
+（逆1圈，停顿z个0.1秒） 共0.1z秒
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210513112435575.gif#pic_center)
+
+## 自定义模式
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210513131429428.gif#pic_center)
